@@ -26,3 +26,5 @@ export type VideoAPOD = {
 
 // NOTE: итоговый тип с двумя случаями
 export type APODResponse = ImageAPOD | VideoAPOD;
+
+// TODO: Следующий контракт нужно сгенерировать автоматически с помощью документации open api nasa(swagger или др.)

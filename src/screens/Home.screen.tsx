@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { NavigateLink } from '../components/NavigateLink';
+import { NavigateLink } from '../components/navigateLink';
 
 export const HomeScreen = () => {
   return (

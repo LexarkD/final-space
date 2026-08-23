@@ -3,6 +3,10 @@ import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen } from './screens/Home.screen';
 import { GalleryScreen } from './screens/Gallery.screen';
+import { Provider } from 'react-redux';
+import { PersistGate } from 'redux-persist/integration/react';
+import { store } from './store/store.ts';
+import { persistor } from './store/store.ts';
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: 'Home',
@@ -25,9 +29,15 @@ const RootStack = createNativeStackNavigator({
 
 const Navigation = createStaticNavigation(RootStack);
 
-export default function App() {
-  return <Navigation />;
-}
+export const App: React.FC = () => {
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <Navigation />
+      </PersistGate>
+    </Provider>
+  );
+};
 
 // import { useNavigation } from '@react-navigation/native';
 // const navigation = useNavigation();
