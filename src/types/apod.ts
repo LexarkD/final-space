@@ -1,4 +1,4 @@
-// NOTE: API Контракт для APOD
+// NOTE: API Контракт для APOD - "Astronomy Picture of the Day"
 // NOTE: Общие поля - приходят всегда.
 export type BaseAPOD = {
   date: string;

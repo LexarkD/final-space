@@ -3,12 +3,12 @@ import type { RootState } from '../store.ts';
 import type { APODResponse } from '../../types/apod.ts';
 import { nasaApi } from '../../api/nasaApi.ts';
 
-type ApodState = {
-  lastSavedPhoto: APODResponse | null;
+type APODState = {
+  lastSavedAPOD: APODResponse | null;
 };
 
-const initialState: ApodState = {
-  lastSavedPhoto: null,
+const initialState: APODState = {
+  lastSavedAPOD: null,
 };
 
 export const apodSlice = createSlice({
@@ -24,14 +24,21 @@ export const apodSlice = createSlice({
       nasaApi.endpoints.getApod.matchFulfilled,
       // NOTE: reducer
       (state, action) => {
-        state.lastSavedPhoto = action.payload;
+        state.lastSavedAPOD = action.payload;
       },
     );
   },
 });
 
-export const selectLastPhoto = (
-  state: RootState,
-): ApodState['lastSavedPhoto'] => state.apod.lastSavedPhoto;
+export const selectLastAPOD = (state: RootState): APODState['lastSavedAPOD'] =>
+  state.apod.lastSavedAPOD;
+
+export const selectLastAPODUrl = (state: RootState): string | undefined => {
+  const apod = state.apod.lastSavedAPOD;
+  if (!apod) {
+    return undefined;
+  }
+  return apod.media_type === 'video' ? apod.thumbnail_url : apod.url;
+};
 
 export default apodSlice.reducer;
