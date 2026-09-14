@@ -1,52 +1,64 @@
 import React from 'react';
-import { ScrollView, Text, StyleSheet } from 'react-native';
-import { PictureDay } from '../components/PictureDay';
-import { useGetApodQuery } from '../api/nasaApi';
-import { NavigateLink } from '../components/NavigateLink';
-import { OfflineBanner } from '../components/OfflineBanner';
+import { ScrollView, StyleSheet } from 'react-native';
 
-// TODO: реализовать
-// refetchOnFocus - повторный запрос после скрытия и открытия приложения
-// refetchOnReconnect - повторный запрос после потери и восстановления сети
-// refetch - реализация "Pull to Refresh"
+import { useGetApodQuery } from '../api/nasaApi';
+import { HomeScreenHeader } from '../components/HomeScreenHeader';
+import { OfflineBanner } from '../components/OfflineBanner';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../constants/theme';
+import { PictureDayCard } from '../components/PictureDayCard';
 
 export const HomeScreen: React.FC = () => {
   // NOTE: хук apod запроса. Пинаю запрос, получаю метаданные
   const { isError } = useGetApodQuery();
 
   return (
-    <ScrollView style={styles.container}>
-      {isError && <OfflineBanner />}
+    <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
+        {isError && <OfflineBanner />}
+        <HomeScreenHeader />
 
-      <NavigateLink screen="PictureDay" style={styles.button}>
-        <PictureDay />
-      </NavigateLink>
-
-      <NavigateLink screen="Setting" style={styles.button}>
-        <Text style={styles.description}>SETTING</Text>
-      </NavigateLink>
-    </ScrollView>
+        <PictureDayCard />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#0B0F19',
+    paddingHorizontal: theme.spacing.m,
+    backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
+  contentContainer: {
+    gap: 8,
+  },
+
   description: {
     color: '#CBD5E1',
     fontSize: 16,
     lineHeight: 24,
   },
   button: {
-    justifyContent: 'center',
     alignItems: 'flex-end',
-    minHeight: 48,
     paddingVertical: 12,
-    paddingHorizontal: 8,
   },
 });
+
+// TODO: реализовать ActivityIndicator
+// пример:
+// if (isLoading && !displayData) {
+//   return (
+//     <View style={styles.centerContainer}>
+//       <ActivityIndicator size="large" color="#FFFFFF" />
+//     </View>
+//   );
+// }
+
+// TODO: реализовать
+// refetchOnFocus - повторный запрос после скрытия и открытия приложения
+// refetchOnReconnect - повторный запрос после потери и восстановления сети
+// refetch - реализация "Pull to Refresh"
 
 //TODO: Если код будет перегружен условными рендерами, стоит выделить отдельные состояния приложения семантически
 // const firstLoading = isLoading && !displayData;

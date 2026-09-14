@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useGetApodQuery } from '../api/nasaApi';
 import { useAppSelector } from '../hooks/redux.hooks';
+import FastImage from '@d11/react-native-fast-image';
 import { selectLastAPOD } from '../store/slices/apodSlice';
 import { OfflineBanner } from '../components/OfflineBanner';
-import { PictureDay } from '../components/PictureDay';
-
-//TODO: Не допустить повторную возможность лайка старых данных
+import { PictureDayImage } from '../components/PictureDayImage';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../constants/theme';
+import { AppText } from '../components/AppText';
 
 export const PictureDayScreen: React.FC = () => {
   const lastAPOD = useAppSelector(selectLastAPOD);
@@ -16,58 +18,59 @@ export const PictureDayScreen: React.FC = () => {
     // NOTE: early return. Отработка крайнего случая. Первый запуск + нет соединения - показ дескрипшена, с объяснением что тут будет
     if (!lastAPOD) {
       return (
-        <View>
-          <Text style={styles.title}>
+        <View style={styles.textContainer}>
+          <AppText variant="body">
             После загрузки данных, тут будет описание астрономического фото дня
-          </Text>
+          </AppText>
         </View>
       );
     }
     return (
-      <View>
-        <Text style={styles.title}>{lastAPOD.title}</Text>
-        <Text style={styles.date}>{lastAPOD.date}</Text>
-        <Text style={styles.description} numberOfLines={4}>
-          {lastAPOD.explanation}
-        </Text>
+      <View style={styles.textContainer}>
+        <AppText variant="h1">{lastAPOD.title}</AppText>
+        <AppText variant="caption">{lastAPOD.date}</AppText>
+        <AppText variant="body">{lastAPOD.explanation}</AppText>
       </View>
     );
   };
 
   return (
-    <View style={styles.container}>
-      {isError && <OfflineBanner />}
-      <PictureDay />
-      <View style={styles.textContainer}>{renderAPODDescription()}</View>
-    </View>
+    <ScrollView contentContainerStyle={styles.contentContainer}>
+      <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
+        {isError && <OfflineBanner />}
+        <PictureDayImage
+          style={styles.image}
+          resizeMode={FastImage.resizeMode.cover}
+        />
+        <View style={styles.textContainer}>{renderAPODDescription()}</View>
+      </SafeAreaView>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  screen: {
     flex: 1,
-    backgroundColor: '#0B0F19',
+    paddingHorizontal: theme.spacing.m,
+    backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
+  },
+  contentContainer: {
+    backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
+  },
+  image: {
+    // Размеры (Паттерн 3: Кратность 8)
+    width: '100%',
+    aspectRatio: 1,
+    borderRadius: 8,
+    overflow: 'hidden',
   },
   textContainer: {
-    padding: 16,
-    flex: 1,
-  },
-  title: {
-    color: '#F8FAFC',
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 4,
-    lineHeight: 32,
-  },
-  date: {
-    color: '#94A3B8',
-    fontSize: 14,
-    fontWeight: '500',
-    marginBottom: 16,
-  },
-  description: {
-    color: '#CBD5E1',
-    fontSize: 16,
-    lineHeight: 24,
+    gap: theme.spacing.m,
+    paddingHorizontal: theme.spacing.xs,
+    paddingVertical: theme.spacing.m,
   },
 });
+
+// TODO: Убрать белые области сверху и снизу ScrollView. Видны если сильно проскролить
+
+//TODO: Не допустить повторную возможность лайка старых данных

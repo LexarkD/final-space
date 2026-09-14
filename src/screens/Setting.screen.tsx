@@ -3,6 +3,8 @@ import { View, Text, Pressable, StyleSheet, Button, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import FastImage from '@d11/react-native-fast-image';
 import { persistor } from '../store/store';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { theme } from '../constants/theme';
 
 export const SettingScreen = () => {
   const navigation = useNavigation();
@@ -25,20 +27,28 @@ export const SettingScreen = () => {
     }
   };
   return (
-    <View style={styles.container}>
-      <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-        <Text>Go back</Text>
-      </Pressable>
-      <Button
-        title="[DEV] Очистить кэш"
-        onPress={clearAppCache}
-        color="#EF4444"
-      />
-    </View>
+    <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
+      <View style={styles.container}>
+        <Pressable style={styles.button} onPress={() => navigation.goBack()}>
+          <Text style={theme.typography.description}>Go back</Text>
+        </Pressable>
+        <Button
+          title="[DEV] Очистить кэш"
+          onPress={clearAppCache}
+          color="#EF4444"
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    paddingTop: theme.spacing.s,
+    paddingHorizontal: theme.spacing.s,
+    backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
+  },
   container: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   button: {
     justifyContent: 'center',

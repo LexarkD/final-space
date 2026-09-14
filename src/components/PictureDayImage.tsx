@@ -1,29 +1,37 @@
 import React from 'react';
-import { View, StyleSheet, Image } from 'react-native';
-import FastImage from '@d11/react-native-fast-image';
+import { View, StyleSheet, Image, StyleProp, ViewStyle } from 'react-native';
+import FastImage, { ResizeMode } from '@d11/react-native-fast-image';
 import { useAppSelector } from '../hooks/redux.hooks';
 import { selectLastAPODUrl } from '../store/slices/apodSlice';
+import { theme } from '../constants/theme';
 
-export const PictureDay: React.FC = () => {
+type PictureDayImageProps = {
+  style?: StyleProp<ViewStyle>;
+  resizeMode?: ResizeMode;
+};
+
+export const PictureDayImage: React.FC<PictureDayImageProps> = ({
+  style,
+  resizeMode = FastImage.resizeMode.cover,
+}) => {
   // NOTE: Получаю контент из apodSlice. При успешном запросе (GetApodQuery), extraReducers автоматически обновит в apodSlice старые данные на новые.
   // Имеется единый источник правды apodSlice. У меня отсутствует необходимость прописывать кейсы, когда брать контент из useGetApodQuery, а когда из - useAppSelector.
   // Так же я получаю паттерн поведения Stale-While-Revalidate - показываю кешированные данные, пока ожидаю ответ с новыми.
-  // TODO: думаю, нужен ли мне ActivityIndicator?
   const lastAPODUrl = useAppSelector(selectLastAPODUrl);
 
-  // NOTE: Отработка крайнего случая. Первый запуск + нет соединения - показ заглушки
+  // NOTE: Показ заглушки. Отработка крайнего случая - первый запуск + нет соединения
   if (!lastAPODUrl) {
     return (
-      <View style={styles.centerContainer}>
+      <View style={[styles.stubContainer, style]}>
         <Image
-          source={require('../assets/images/stub-space.jpg')}
+          source={require('../../assets/images/stub-space.jpg')}
           style={styles.image}
         />
       </View>
     );
   }
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, style]}>
       <FastImage
         style={styles.image}
         source={{
@@ -32,7 +40,7 @@ export const PictureDay: React.FC = () => {
           //NOTE: web означает, доверять заголовкам сервера, но кэшировать на диск
           cache: FastImage.cacheControl.web,
         }}
-        resizeMode={FastImage.resizeMode.cover}
+        resizeMode={resizeMode}
       />
     </View>
   );
@@ -40,30 +48,16 @@ export const PictureDay: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: 350,
-    backgroundColor: '#0B0F19',
+    overflow: 'hidden',
   },
-  centerContainer: {
-    width: '100%',
-    height: 350,
-    backgroundColor: '#0B0F19',
+  stubContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    overflow: 'hidden',
+    padding: theme.spacing.m,
   },
   image: {
     width: '100%',
-    height: 350, // можно использовать aspectRatio
-    backgroundColor: '#1A2235',
+    height: '100%',
   },
 });
-
-// NOTE: Индикатор загрузки
-// if (isLoading && !displayData) {
-//   return (
-//     <View style={styles.centerContainer}>
-//       <ActivityIndicator size="large" color="#FFFFFF" />
-//     </View>
-//   );
-// }

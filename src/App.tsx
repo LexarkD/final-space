@@ -14,17 +14,11 @@ import { persistor } from './store/store.ts';
 const RootStack = createNativeStackNavigator({
   initialRouteName: 'Home',
   screenOptions: {
-    headerTitleStyle: { color: '#FFFFFF' },
-    headerStyle: {
-      backgroundColor: '#303133',
-    },
+    headerShown: false,
   },
   screens: {
     Home: {
       screen: HomeScreen,
-      options: {
-        title: 'Home',
-      },
     },
     PictureDay: PictureDayScreen,
     Gallery: GalleryScreen,
