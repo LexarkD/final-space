@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { RootState } from '../store.ts';
-import type { APODResponse } from '../../types/apod.ts';
+import type { APODResponse } from '../../types/apodApiType.ts';
 import { nasaApi } from '../../api/nasaApi.ts';
 
 type APODState = {

@@ -1,6 +1,6 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 import { NASA_API_KEY } from '../constants/apiKey';
-import type { APODResponse } from '../types/apod';
+import type { APODResponse } from '../types/apodApiType';
 
 // NOTE: Если отсутствует собственный зарегестрированный ключ, NASA предоставляет тестовый ключ 'DEMO_KEY'
 // const NASA_API_KEY = 'DEMO_KEY';
