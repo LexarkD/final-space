@@ -7,6 +7,7 @@ import { OfflineBanner } from '../components/OfflineBanner';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { PictureDayCard } from '../components/PictureDayCard';
+import { NewsCard } from '../components/NewsCard';
 
 export const HomeScreen: React.FC = () => {
   // NOTE: хук apod запроса. Пинаю запрос, получаю метаданные
@@ -19,6 +20,7 @@ export const HomeScreen: React.FC = () => {
         <HomeScreenHeader />
 
         <PictureDayCard />
+        <NewsCard />
       </ScrollView>
     </SafeAreaView>
   );

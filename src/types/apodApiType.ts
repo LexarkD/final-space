@@ -23,8 +23,7 @@ export type VideoAPOD = {
   // NOTE: превью видео! Поле может отсутствовать.
   thumbnail_url?: string;
 } & BaseAPOD;
+//TODO: Надо подумать, как UI будет обрабатывать media_type
 
 // NOTE: итоговый тип с двумя случаями
 export type APODResponse = ImageAPOD | VideoAPOD;
-
-// TODO: Следующий контракт нужно сгенерировать автоматически с помощью документации open api nasa(swagger или др.)

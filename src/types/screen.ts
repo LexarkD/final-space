@@ -2,8 +2,9 @@
 export type RootStackParamList = {
   Home: undefined;
   Gallery: undefined;
-  Setting: undefined;
   PictureDay: undefined;
+  News: undefined;
+  Setting: undefined;
 };
 
 declare global {

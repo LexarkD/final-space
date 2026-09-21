@@ -1,5 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit';
 import apodSliceReducer from './slices/apodSlice.ts';
+import newsPreviewReducer from './slices/newsPreviewSlice.ts';
+
 import { nasaApi } from '../api/nasaApi.ts';
 import {
   PersistConfig,
@@ -14,11 +16,14 @@ import {
 } from 'redux-persist';
 import { STORAGE_KEY } from '../constants/storageKey.ts';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { baseSplitApi } from '../api/baseSplitApi.ts';
 
 // NOTE: combineReducers собирает редюсеры вместе
 const combinedReducer = combineReducers({
   apod: apodSliceReducer,
+  newsPreview: newsPreviewReducer,
   [nasaApi.reducerPath]: nasaApi.reducer,
+  [baseSplitApi.reducerPath]: baseSplitApi.reducer,
 });
 
 type CombinedReducerState = ReturnType<typeof combinedReducer>;
@@ -27,7 +32,7 @@ const persistConfig: PersistConfig<CombinedReducerState> = {
   key: STORAGE_KEY,
   storage: AsyncStorage,
   // NOTE: вношу в черный список кэш RTK Query - там много ненужных данных
-  blacklist: [nasaApi.reducerPath],
+  blacklist: [nasaApi.reducerPath, baseSplitApi.reducerPath],
 };
 
 // NOTE: persistReducer() Управляет автоматическим сохранением данных и восстановлением данных в/из AsyncStorage
@@ -42,7 +47,7 @@ export const store = configureStore({
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
       // NOTE: подключаю middleware от RTK Query
-    }).concat(nasaApi.middleware),
+    }).concat(nasaApi.middleware, baseSplitApi.middleware),
 });
 
 // NOTE: экспортирую persistor для компонента PersistGate (в App.tsx) - обеспечит синхронизацию UI с прогрузкой AsyncStorage

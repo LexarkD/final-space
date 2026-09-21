@@ -20,6 +20,14 @@ export const nasaApi = createApi({
           thumbs: true,
         },
       }),
+      transformResponse: (response: APODResponse): APODResponse => {
+        if (!response || !response.url || !response.title) {
+          throw new Error(
+            'Сервер вернул некорректные данные: фото дня не найдено',
+          );
+        }
+        return response;
+      },
     }),
   }),
 });

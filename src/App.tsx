@@ -2,9 +2,10 @@ import React from 'react';
 import { createStaticNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { HomeScreen } from './screens/Home.screen';
-import { GalleryScreen } from './screens/Gallery.screen';
+
 import { SettingScreen } from './screens/Setting.screen';
 import { PictureDayScreen } from './screens/PictureDay.screen';
+import { NewsScreen } from './screens/News.screen';
 
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
@@ -21,7 +22,7 @@ const RootStack = createNativeStackNavigator({
       screen: HomeScreen,
     },
     PictureDay: PictureDayScreen,
-    Gallery: GalleryScreen,
+    News: NewsScreen,
     Setting: SettingScreen,
   },
 });
