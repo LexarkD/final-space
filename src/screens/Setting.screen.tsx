@@ -30,7 +30,7 @@ export const SettingScreen = () => {
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
       <View style={styles.container}>
         <Pressable style={styles.button} onPress={() => navigation.goBack()}>
-          <Text style={theme.typography.description}>Go back</Text>
+          <Text style={theme.typography.body}>Go back</Text>
         </Pressable>
         <Button
           title="[DEV] Очистить кэш"

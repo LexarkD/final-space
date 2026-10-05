@@ -3,11 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useAppSelector } from '../hooks/redux.hooks';
 import { selectLastAPOD } from '../store/slices/apodSlice';
 import { PictureDayImage } from './PictureDayImage';
-import { NavigateLink } from '../components/NavigateLink';
-import { AppText } from '../components/AppText';
+import { NavigateLink } from './NavigateLink';
+import { AppText } from './AppText';
 import { theme } from '../constants/theme';
 
-export const PictureDayCard: React.FC = () => {
+export const PictureDayPreview: React.FC = () => {
   const lastAPOD = useAppSelector(selectLastAPOD);
   return (
     <NavigateLink screen="PictureDay">

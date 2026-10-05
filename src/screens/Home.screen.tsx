@@ -1,26 +1,29 @@
 import React from 'react';
 import { ScrollView, StyleSheet } from 'react-native';
-
 import { useGetApodQuery } from '../api/nasaApi';
+import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
 import { HomeScreenHeader } from '../components/HomeScreenHeader';
 import { OfflineBanner } from '../components/OfflineBanner';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
-import { PictureDayCard } from '../components/PictureDayCard';
-import { NewsCard } from '../components/NewsCard';
+import { PictureDayPreview } from '../components/PictureDayPreview';
+import { NewsPreview } from '../components/NewsPreview';
 
 export const HomeScreen: React.FC = () => {
   // NOTE: хук apod запроса. Пинаю запрос, получаю метаданные
-  const { isError } = useGetApodQuery();
+
+  const { isError: isErrorApod } = useGetApodQuery();
+  const { isError: isErrorNews } = useGetNewsPreviewQuery();
+  const isErrorQuery = isErrorApod || isErrorNews;
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {isError && <OfflineBanner />}
+        {isErrorQuery && <OfflineBanner />}
         <HomeScreenHeader />
 
-        <PictureDayCard />
-        <NewsCard />
+        <PictureDayPreview />
+        <NewsPreview />
       </ScrollView>
     </SafeAreaView>
   );
@@ -29,11 +32,12 @@ export const HomeScreen: React.FC = () => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingHorizontal: theme.spacing.m,
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
   contentContainer: {
     gap: 8,
+    paddingHorizontal: theme.spacing.m,
+    paddingBottom: theme.spacing.l,
   },
 
   description: {
@@ -47,22 +51,9 @@ const styles = StyleSheet.create({
   },
 });
 
-// TODO: реализовать ActivityIndicator
-// пример:
-// if (isLoading && !displayData) {
-//   return (
-//     <View style={styles.centerContainer}>
-//       <ActivityIndicator size="large" color="#FFFFFF" />
-//     </View>
-//   );
-// }
-
 // TODO: реализовать
 // refetchOnFocus - повторный запрос после скрытия и открытия приложения
 // refetchOnReconnect - повторный запрос после потери и восстановления сети
 // refetch - реализация "Pull to Refresh"
 
-//TODO: Если код будет перегружен условными рендерами, стоит выделить отдельные состояния приложения семантически
-// const firstLoading = isLoading && !displayData;
-// const offlineFirstStart = isError && !displayData;
-// сосотояние isLoading && displayData и -  isError && displayData отрабатывает автоматически builder.addMatcher(apodSlice)
+//TODO: Поскольку приложение работает с разными серверами, сообщение об ошибке сети должны быть понятно связано с конкретным сервером. Потому что один сервер может работать штатно, а другой -нет

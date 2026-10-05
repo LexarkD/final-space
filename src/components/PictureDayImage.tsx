@@ -3,7 +3,6 @@ import { View, StyleSheet, Image, StyleProp, ViewStyle } from 'react-native';
 import FastImage, { ResizeMode } from '@d11/react-native-fast-image';
 import { useAppSelector } from '../hooks/redux.hooks';
 import { selectLastAPODUrl } from '../store/slices/apodSlice';
-import { theme } from '../constants/theme';
 
 type PictureDayImageProps = {
   style?: StyleProp<ViewStyle>;
@@ -19,6 +18,7 @@ export const PictureDayImage: React.FC<PictureDayImageProps> = ({
   // Так же я получаю паттерн поведения Stale-While-Revalidate - показываю кешированные данные, пока ожидаю ответ с новыми.
   const lastAPODUrl = useAppSelector(selectLastAPODUrl);
 
+  // TODO: Изменить поведение. При отсутствии данных, на экран попасть нельзя
   // NOTE: Показ заглушки. Отработка крайнего случая - первый запуск + нет соединения
   if (!lastAPODUrl) {
     return (
@@ -31,7 +31,7 @@ export const PictureDayImage: React.FC<PictureDayImageProps> = ({
     );
   }
   return (
-    <View style={[styles.container, style]}>
+    <View style={style}>
       <FastImage
         style={styles.image}
         source={{
@@ -47,14 +47,11 @@ export const PictureDayImage: React.FC<PictureDayImageProps> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-    overflow: 'hidden',
-  },
   stubContainer: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
-    padding: theme.spacing.m,
   },
   image: {
     width: '100%',

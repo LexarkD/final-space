@@ -35,26 +35,27 @@ export const PictureDayScreen: React.FC = () => {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.contentContainer}>
-      <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
+    <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
+      <ScrollView contentContainerStyle={styles.contentContainer}>
         {isError && <OfflineBanner />}
         <PictureDayImage
           style={styles.image}
           resizeMode={FastImage.resizeMode.cover}
         />
         <View style={styles.textContainer}>{renderAPODDescription()}</View>
-      </SafeAreaView>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    paddingHorizontal: theme.spacing.m,
+
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
   contentContainer: {
+    paddingHorizontal: theme.spacing.m,
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
   image: {
@@ -70,7 +71,3 @@ const styles = StyleSheet.create({
     paddingVertical: theme.spacing.m,
   },
 });
-
-// TODO: Убрать белые области сверху и снизу ScrollView. Видны если сильно проскролить
-
-//TODO: Не допустить повторную возможность лайка старых данных
