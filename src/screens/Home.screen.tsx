@@ -1,33 +1,55 @@
-import React from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
-import { useGetApodQuery } from '../api/nasaApi';
-import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
+import React, { useState, useCallback } from 'react';
+import { ScrollView, StyleSheet, RefreshControl } from 'react-native';
+
 import { HomeScreenHeader } from '../components/HomeScreenHeader';
-import { OfflineBanner } from '../components/OfflineBanner';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { PictureDayPreview } from '../components/PictureDayPreview';
+import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
+import { useGetApodQuery } from '../api/nasaApi';
 import { NewsPreview } from '../components/NewsPreview';
 
 export const HomeScreen: React.FC = () => {
-  // NOTE: хук apod запроса. Пинаю запрос, получаю метаданные
+  const { refetch: refetchAPOD } = useGetApodQuery();
+  const { refetch: refetchNews } = useGetNewsPreviewQuery();
 
-  const { isError: isErrorApod } = useGetApodQuery();
-  const { isError: isErrorNews } = useGetNewsPreviewQuery();
-  const isErrorQuery = isErrorApod || isErrorNews;
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await Promise.all([refetchAPOD(), refetchNews()]);
+    } catch (error) {
+      console.error('Ошибка при обновлении данных: ', error);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refetchAPOD, refetchNews]);
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        {isErrorQuery && <OfflineBanner />}
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            //NOTE: Цвет для iOS
+            tintColor={theme.UI_COLOR_CONFIG.icon}
+            //NOTE: Цвета для Android
+            colors={[theme.UI_COLOR_CONFIG.icon]}
+          />
+        }
+      >
         <HomeScreenHeader />
-
         <PictureDayPreview />
         <NewsPreview />
       </ScrollView>
     </SafeAreaView>
   );
 };
+
+//TODO: сделать некликабельной NavigateLink, если запрос закончился с ошибкой или data не валидна
 
 const styles = StyleSheet.create({
   screen: {
@@ -51,9 +73,6 @@ const styles = StyleSheet.create({
   },
 });
 
-// TODO: реализовать
-// refetchOnFocus - повторный запрос после скрытия и открытия приложения
-// refetchOnReconnect - повторный запрос после потери и восстановления сети
-// refetch - реализация "Pull to Refresh"
-
-//TODO: Поскольку приложение работает с разными серверами, сообщение об ошибке сети должны быть понятно связано с конкретным сервером. Потому что один сервер может работать штатно, а другой -нет
+//TODO usePrefetch?
+//Скелетоны вместо спиннеров: При первичной загрузке (когда isLoading === true) отображай 3-4 "скелетных" карточки новостей (серые мерцающие блоки). Это визуально ускоряет восприятие приложения пользователем (Perceived Performance).
+//Изолированная обработка ошибок: Если загрузка страницы 2 упала с ошибкой, не ломай весь экран. Покажи пользователю старые данные и небольшой Toast или Snackbar снизу: "Не удалось загрузить новые данные. Повторить?".

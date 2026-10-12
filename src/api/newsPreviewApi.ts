@@ -12,6 +12,7 @@ export const newsPreviewApi = newsOpenApi.injectEndpoints({
         url: '/v4/articles/',
         params: { limit: 1 },
       }),
+      // keepUnusedDataFor: 10,
       // NOTE: Трансформирую и валидирую ответ сервера до попадения в redux store
       transformResponse: (response: PaginatedArticleListRead): ArticleRead => {
         const newsPreview = response?.results?.[0];
@@ -29,6 +30,7 @@ export const newsPreviewApi = newsOpenApi.injectEndpoints({
 });
 
 export const { useGetNewsPreviewQuery } = newsPreviewApi;
+
 // NOTE: useGetNewsPreviewQuery - тригер для сетевого запроса
 // Описание цепочки событий начиная с тригера:
 // 1) Компонент монтируется ➔ вызывает useGetNewsPreviewQuery()
