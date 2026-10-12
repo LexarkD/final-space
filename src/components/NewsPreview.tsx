@@ -1,55 +1,58 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { useAppSelector } from '../hooks/redux.hooks';
-import { selectNewsPreview } from '../store/slices/newsPreviewSlice';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigateLink } from './NavigateLink';
-import { AppText } from './AppText';
 import { theme } from '../constants/theme';
-import FastImage from '@d11/react-native-fast-image';
+import { AppText } from './AppText';
+import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
+import { RemoteImageWithLoader } from './RemoteImageWithLoader';
 
 export const NewsPreview: React.FC = () => {
-  const newsPreview = useAppSelector(selectNewsPreview);
-  const datePreview = !newsPreview
-    ? null
-    : newsPreview.published_at.split('T')[0];
+  const { status, data: dataQuery } = useGetNewsPreviewQuery();
 
-  const renderImagePreview = () => {
-    if (!newsPreview) {
+  const validData = Boolean(dataQuery);
+  const imageUrl = dataQuery?.image_url;
+
+  const renderContainerStatus = () => {
+    if (status === 'pending') {
       return (
-        <View style={styles.stubContainer}>
-          <Image
-            source={require('../../assets/images/stub-space.jpg')}
-            style={styles.image}
-          />
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={theme.UI_COLOR_CONFIG.icon} />
         </View>
       );
     }
-    return (
-      <FastImage
-        style={styles.image}
-        source={{
-          uri: newsPreview.image_url,
-          priority: FastImage.priority.high,
-          //NOTE: web означает, доверять заголовкам сервера, но кэшировать на диск
-          cache: FastImage.cacheControl.web,
-        }}
-        resizeMode="cover"
-      />
-    );
+
+    if (status === 'rejected') {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Космос временно недоступен</Text>
+        </View>
+      );
+    }
+    if (!validData) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Космос временно недоступен</Text>
+        </View>
+      );
+    }
+
+    if (status === 'fulfilled' && imageUrl) {
+      return <RemoteImageWithLoader imageUrl={imageUrl} />;
+    } else {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Упс! Что-то пошло не так </Text>
+        </View>
+      );
+    }
   };
+
   return (
     <NavigateLink screen="News">
       <View style={styles.card}>
         <Text style={theme.typography.h1}>News</Text>
-        <View style={styles.previewImage}>{renderImagePreview()}</View>
-        {newsPreview && (
-          <>
-            <AppText variant="body" numberOfLines={2}>
-              {newsPreview.title}
-            </AppText>
-            <AppText variant="caption">{`${datePreview}`}</AppText>
-          </>
-        )}
+        <View style={styles.previewImage}>{renderContainerStatus()}</View>
+        <AppText variant="body">See More News</AppText>
       </View>
     </NavigateLink>
   );
@@ -68,14 +71,23 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 12,
   },
-  stubContainer: {
+  loaderContainer: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 0,
+    top: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    overflow: 'hidden',
-    padding: theme.spacing.m,
   },
-  image: {
-    width: '100%',
-    height: '100%',
+  errorContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffe6e6',
   },
 });

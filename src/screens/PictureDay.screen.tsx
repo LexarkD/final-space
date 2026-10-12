@@ -1,48 +1,69 @@
 import React from 'react';
-import { View, StyleSheet, ScrollView } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  Text,
+} from 'react-native';
 import { useGetApodQuery } from '../api/nasaApi';
-import { useAppSelector } from '../hooks/redux.hooks';
-import FastImage from '@d11/react-native-fast-image';
-import { selectLastAPOD } from '../store/slices/apodSlice';
-import { OfflineBanner } from '../components/OfflineBanner';
-import { PictureDayImage } from '../components/PictureDayImage';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { AppText } from '../components/AppText';
+import { RemoteImageWithLoader } from '../components/RemoteImageWithLoader';
 
 export const PictureDayScreen: React.FC = () => {
-  const lastAPOD = useAppSelector(selectLastAPOD);
-  const { isError } = useGetApodQuery();
+  const { status, data: dataQuery } = useGetApodQuery();
 
-  const renderAPODDescription = () => {
-    // NOTE: early return. Отработка крайнего случая. Первый запуск + нет соединения - показ дескрипшена, с объяснением что тут будет
-    if (!lastAPOD) {
+  const validData = Boolean(dataQuery);
+  const imageUrl = dataQuery?.url;
+
+  const renderContainerStatus = () => {
+    if (status === 'pending') {
       return (
-        <View style={styles.textContainer}>
-          <AppText variant="body">
-            После загрузки данных, тут будет описание астрономического фото дня
-          </AppText>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color={theme.UI_COLOR_CONFIG.icon} />
         </View>
       );
     }
-    return (
-      <View style={styles.textContainer}>
-        <AppText variant="h1">{lastAPOD.title}</AppText>
-        <AppText variant="caption">{lastAPOD.date}</AppText>
-        <AppText variant="body">{lastAPOD.explanation}</AppText>
-      </View>
-    );
+
+    if (status === 'rejected') {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Космос временно недоступен</Text>
+        </View>
+      );
+    }
+    if (!validData) {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Космос временно недоступен</Text>
+        </View>
+      );
+    }
+
+    if (status === 'fulfilled' && imageUrl) {
+      return <RemoteImageWithLoader imageUrl={imageUrl} />;
+    } else {
+      return (
+        <View style={styles.errorContainer}>
+          <Text>Упс! Что-то пошло не так </Text>
+        </View>
+      );
+    }
   };
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        {isError && <OfflineBanner />}
-        <PictureDayImage
-          style={styles.image}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <View style={styles.textContainer}>{renderAPODDescription()}</View>
+        <View style={styles.image}>{renderContainerStatus()}</View>
+        {status === 'fulfilled' && (
+          <View style={styles.textContainer}>
+            <AppText variant="h1">{dataQuery?.title}</AppText>
+            <AppText variant="caption">{dataQuery?.date}</AppText>
+            <AppText variant="body">{dataQuery?.explanation}</AppText>
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -51,7 +72,6 @@ export const PictureDayScreen: React.FC = () => {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
   contentContainer: {
@@ -59,7 +79,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
   image: {
-    // Размеры (Паттерн 3: Кратность 8)
     width: '100%',
     aspectRatio: 1,
     borderRadius: 8,
@@ -69,5 +88,24 @@ const styles = StyleSheet.create({
     gap: theme.spacing.m,
     paddingHorizontal: theme.spacing.xs,
     paddingVertical: theme.spacing.m,
+  },
+  loaderContainer: {
+    position: 'absolute',
+    left: 12,
+    right: 12,
+    bottom: 0,
+    top: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  errorContainer: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    bottom: 0,
+    top: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffe6e6',
   },
 });
