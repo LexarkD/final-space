@@ -14,7 +14,6 @@ export const newsListApi = newsOpenApi.injectEndpoints({
           offset,
         },
       }),
-      // NOTE: Трансформирую и валидирую ответ сервера до попадения в redux store
       transformResponse: (
         response: PaginatedArticleListRead,
       ): PaginatedArticleListRead => {
