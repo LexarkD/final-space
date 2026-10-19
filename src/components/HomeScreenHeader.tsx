@@ -2,15 +2,12 @@ import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { NavigateLink } from './NavigateLink';
 import { SettingIcon } from './AppIcon';
-import { MenuIcon } from './AppIcon';
 import { theme } from '../constants/theme';
 
 export const HomeScreenHeader: React.FC = () => {
   return (
     <View style={styles.container}>
-      <View style={styles.leftBlock}>
-        <MenuIcon />
-      </View>
+      <View style={styles.leftBlock} />
       <Image
         style={styles.logo}
         source={require('../../assets/images/logo.png')}

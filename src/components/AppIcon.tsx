@@ -19,28 +19,6 @@ export const SettingIcon: React.FC<IconProps> = ({ style, size = 36 }) => {
   );
 };
 
-export const FavoriteIcon: React.FC<IconProps> = ({ style, size = 36 }) => {
-  return (
-    <Svg style={style} width={size} height={size} viewBox="0 -960 960 960">
-      <Path
-        fill={theme.UI_COLOR_CONFIG.icon}
-        d="m323-245 157-94 157 95-42-178 138-120-182-16-71-168-71 167-182 16 138 120-42 178Zm-90 125 65-281L80-590l288-25 112-265 112 265 288 25-218 189 65 281-247-149-247 149Zm247-355Z"
-      />
-    </Svg>
-  );
-};
-
-export const MenuIcon: React.FC<IconProps> = ({ style, size = 36 }) => {
-  return (
-    <Svg style={style} width={size} height={size} viewBox="0 -960 960 960">
-      <Path
-        fill={theme.UI_COLOR_CONFIG.icon}
-        d="M120-240v-60h720v60H120Zm0-210v-60h720v60H120Zm0-210v-60h720v60H120Z"
-      />
-    </Svg>
-  );
-};
-
 export const BackIcon: React.FC<IconProps> = ({ style, size = 36 }) => {
   return (
     <Svg style={style} width={size} height={size} viewBox="0 -960 960 960">
