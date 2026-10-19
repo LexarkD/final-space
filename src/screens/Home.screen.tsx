@@ -61,18 +61,4 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.m,
     paddingBottom: theme.spacing.l,
   },
-
-  description: {
-    color: '#CBD5E1',
-    fontSize: 16,
-    lineHeight: 24,
-  },
-  button: {
-    alignItems: 'flex-end',
-    paddingVertical: 12,
-  },
 });
-
-//TODO usePrefetch?
-//Скелетоны вместо спиннеров: При первичной загрузке (когда isLoading === true) отображай 3-4 "скелетных" карточки новостей (серые мерцающие блоки). Это визуально ускоряет восприятие приложения пользователем (Perceived Performance).
-//Изолированная обработка ошибок: Если загрузка страницы 2 упала с ошибкой, не ломай весь экран. Покажи пользователю старые данные и небольшой Toast или Snackbar снизу: "Не удалось загрузить новые данные. Повторить?".

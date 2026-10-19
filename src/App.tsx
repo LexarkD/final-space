@@ -7,7 +7,7 @@ import { SettingScreen } from './screens/Setting.screen';
 import { PictureDayScreen } from './screens/PictureDay.screen';
 import { NewsScreen } from './screens/News.screen';
 import { Provider } from 'react-redux';
-import { store } from './store/store.ts';
+import { store } from './store/store';
 
 const RootStack = createNativeStackNavigator({
   initialRouteName: 'Home',
