@@ -16,7 +16,7 @@ export const PictureDayScreen: React.FC = () => {
   const { status, data: dataQuery } = useGetApodQuery();
 
   const validData = Boolean(dataQuery);
-  const imageUrl = dataQuery?.url;
+  const imageUrl = dataQuery?.imageUrl;
 
   const renderContainerStatus = () => {
     if (status === 'pending') {
