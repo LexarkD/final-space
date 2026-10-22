@@ -1,32 +1,21 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { NASA_API_KEY } from '../constants/apiKey';
-import type { APODResponse } from '../types/apodApiType';
-
-// NOTE: Если отсутствует собственный зарегестрированный ключ, NASA предоставляет тестовый ключ 'DEMO_KEY'
-// const NASA_API_KEY = 'DEMO_KEY';
+import type { Apod, ApodResponse } from '../types/apodApiType';
+import { toApod } from '../utils/apodMapper';
 
 export const nasaApi = createApi({
   reducerPath: 'nasaApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://api.nasa.gov/',
+    baseUrl: 'https://science.nasa.gov/wp-json/wp/v2/',
   }),
   endpoints: builder => ({
-    // NOTE: тип ответа - APODResponse, тип аргумента - void, так как ничего передавать не нужно.
-    getApod: builder.query<APODResponse, void>({
-      query: () => ({
-        url: 'planetary/apod',
-        params: {
-          api_key: NASA_API_KEY,
-          thumbs: true,
-        },
-      }),
-      transformResponse: (response: APODResponse): APODResponse => {
-        if (!response || !response.url || !response.title) {
-          throw new Error(
-            'Сервер вернул некорректные данные: фото дня не найдено',
-          );
+    getApod: builder.query<Apod, void>({
+      query: () => ({ url: 'apod-basic', params: { per_page: 1 } }),
+      transformResponse: (response: ApodResponse[]): Apod => {
+        const latest = response?.[0];
+        if (!latest) {
+          throw new Error('Сервер вернул пустой ответ: фото дня не найдено');
         }
-        return response;
+        return toApod(latest);
       },
     }),
   }),
@@ -34,3 +23,6 @@ export const nasaApi = createApi({
 
 // NOTE: RTK Query автоматически создают хук по шаблону- use + <endpoints name> + Query
 export const { useGetApodQuery } = nasaApi;
+
+//NOTE: Общая картина
+// Сервер → RTK Query получает JSON → transformResponse → toApod(raw) → кэш в Redux store → компонент

@@ -1,28 +1,31 @@
-// NOTE: API Контракт для APOD - "Astronomy Picture of the Day"
-// NOTE: Общие поля - приходят всегда.
-export type BaseAPOD = {
+export type ApodResponse = {
+  //NOTE: формат даты  "YYYY-MM-DD"
   date: string;
-  explanation: string;
+  post_id: number;
   title: string;
+  permalink: string;
+  //NOTE: APOD находится в процессе переезда на новый API и задокументированные media_type: 'image' | 'video' | 'iframe' не соотвествуют реальным результатам тестов.
+  media_type: string;
+  // NOTE: после миграции APOD на новый API, explanation стал приходить с HTML-разметкой и припиской вконце
+  explanation: string;
+  credit: string;
+  alt: string;
+  //NOTE: ссылка на СТАТЬЮ
+  url: string;
+  //NOTE: ссылка на картинку
+  hdurl: string;
+  basic_html: string;
+  basic_html_url: string;
 };
 
-// NOTE: поля приходят, если ответ содержит ссылку на картинку
-export type ImageAPOD = {
-  media_type: 'image';
-  // NOTE: ссылка на картинку
-  url: string;
-  // NOTE: ссылка на картинку в высоком разрешении. Поле может отсутствовать.
-  hdurl?: string;
-} & BaseAPOD;
-
-// NOTE: поля приходят, если ответ содержит ссылку на видео
-export type VideoAPOD = {
-  media_type: 'video';
-  // NOTE: ссылка на видеоплеер
-  url: string;
-  // NOTE: превью видео! Поле может отсутствовать.
-  thumbnail_url?: string;
-} & BaseAPOD;
-
-// NOTE: итоговый тип с двумя случаями
-export type APODResponse = ImageAPOD | VideoAPOD;
+// NOTE: Доменная модель - то что нужно для UI
+export type Apod = {
+  date: string;
+  title: string;
+  explanation: string;
+  credit: string;
+  alt: string | null;
+  media_type: 'image' | 'video' | 'iframe' | 'other';
+  imageUrl: string | null;
+  permalink: string;
+};
