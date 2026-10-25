@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { ScrollView, StyleSheet, RefreshControl } from 'react-native';
 
 import { HomeScreenHeader } from '../components/HomeScreenHeader';
@@ -8,23 +8,16 @@ import { PictureDayPreview } from '../components/PictureDayPreview';
 import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
 import { useGetApodQuery } from '../api/nasaApi';
 import { NewsPreview } from '../components/NewsPreview';
+import { useRefreshByUser } from '../hooks/useRefreshByUser';
 
 export const HomeScreen: React.FC = () => {
   const { refetch: refetchAPOD } = useGetApodQuery();
   const { refetch: refetchNews } = useGetNewsPreviewQuery();
 
-  const [refreshing, setRefreshing] = useState(false);
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await Promise.all([refetchAPOD(), refetchNews()]);
-    } catch (error) {
-      console.error('Ошибка при обновлении данных: ', error);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [refetchAPOD, refetchNews]);
+  const { isRefreshingByUser, refreshByUser } = useRefreshByUser([
+    refetchAPOD,
+    refetchNews,
+  ]);
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
@@ -32,8 +25,8 @@ export const HomeScreen: React.FC = () => {
         contentContainerStyle={styles.contentContainer}
         refreshControl={
           <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
+            refreshing={isRefreshingByUser}
+            onRefresh={refreshByUser}
             //NOTE: Цвет для iOS
             tintColor={theme.UI_COLOR_CONFIG.icon}
             //NOTE: Цвета для Android

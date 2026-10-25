@@ -1,67 +1,38 @@
 import React from 'react';
-import {
-  View,
-  StyleSheet,
-  ScrollView,
-  ActivityIndicator,
-  Text,
-} from 'react-native';
+import { View, StyleSheet, ScrollView, Text } from 'react-native';
 import { useGetApodQuery } from '../api/nasaApi';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { AppText } from '../components/AppText';
 import { RemoteImageWithLoader } from '../components/RemoteImageWithLoader';
+import { QueryStateView } from '../components/QueryStateView';
 
 export const PictureDayScreen: React.FC = () => {
-  const { status, data: dataQuery } = useGetApodQuery();
-
-  const validData = Boolean(dataQuery);
-  const imageUrl = dataQuery?.imageUrl;
-
-  const renderContainerStatus = () => {
-    if (status === 'pending') {
-      return (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={theme.UI_COLOR_CONFIG.icon} />
-        </View>
-      );
-    }
-
-    if (status === 'rejected') {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Космос временно недоступен</Text>
-        </View>
-      );
-    }
-    if (!validData) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Космос временно недоступен</Text>
-        </View>
-      );
-    }
-
-    if (status === 'fulfilled' && imageUrl) {
-      return <RemoteImageWithLoader imageUrl={imageUrl} />;
-    } else {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Упс! Что-то пошло не так </Text>
-        </View>
-      );
-    }
-  };
+  const { isError, data } = useGetApodQuery();
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
       <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.image}>{renderContainerStatus()}</View>
-        {status === 'fulfilled' && (
+        <View style={styles.image}>
+          <QueryStateView
+            data={data}
+            isError={isError}
+            renderData={apod =>
+              apod.imageUrl ? (
+                <RemoteImageWithLoader imageUrl={apod.imageUrl} />
+              ) : (
+                <View style={styles.errorContainer}>
+                  <Text>Упс! Что-то пошло не так</Text>
+                </View>
+              )
+            }
+          />
+        </View>
+        {data && (
           <View style={styles.textContainer}>
-            <AppText variant="h1">{dataQuery?.title}</AppText>
-            <AppText variant="caption">{dataQuery?.date}</AppText>
-            <AppText variant="body">{dataQuery?.explanation}</AppText>
+            <AppText variant="h1">{data.title}</AppText>
+            <AppText variant="caption">{data.date}</AppText>
+            <AppText variant="body">{data.explanation}</AppText>
           </View>
         )}
       </ScrollView>
@@ -88,15 +59,6 @@ const styles = StyleSheet.create({
     gap: theme.spacing.m,
     paddingHorizontal: theme.spacing.xs,
     paddingVertical: theme.spacing.m,
-  },
-  loaderContainer: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 0,
-    top: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   errorContainer: {
     position: 'absolute',
