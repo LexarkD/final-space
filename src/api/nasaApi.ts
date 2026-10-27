@@ -21,7 +21,6 @@ export const nasaApi = createApi({
   }),
 });
 
-// NOTE: RTK Query автоматически создают хук по шаблону- use + <endpoints name> + Query
 export const { useGetApodQuery } = nasaApi;
 
 //NOTE: Общая картина

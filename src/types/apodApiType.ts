@@ -1,10 +1,12 @@
+// NOTE: APOD находится в процессе переезда на новый API. Ручные тесты показали, что поля ответов при разных media_type не всегда соответствуют документации
+// Поэтому логика обработки ответа строится не на контракте, а на реально пришедших данных
+
 export type ApodResponse = {
   //NOTE: формат даты  "YYYY-MM-DD"
   date: string;
   post_id: number;
   title: string;
   permalink: string;
-  //NOTE: APOD находится в процессе переезда на новый API и задокументированные media_type: 'image' | 'video' | 'iframe' не соотвествуют реальным результатам тестов.
   media_type: string;
   // NOTE: после миграции APOD на новый API, explanation стал приходить с HTML-разметкой и припиской вконце
   explanation: string;
@@ -25,7 +27,7 @@ export type Apod = {
   explanation: string;
   credit: string;
   alt: string | null;
-  media_type: 'image' | 'video' | 'iframe' | 'other';
+  media_type: 'image' | 'video' | 'other';
   imageUrl: string | null;
   permalink: string;
 };

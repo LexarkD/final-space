@@ -3,65 +3,59 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  ActivityIndicator,
-  Text,
+  Pressable,
+  RefreshControl,
 } from 'react-native';
 import { useGetApodQuery } from '../api/nasaApi';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { theme } from '../constants/theme';
 import { AppText } from '../components/AppText';
-import { RemoteImageWithLoader } from '../components/RemoteImageWithLoader';
+import { QueryStateView } from '../components/QueryStateView';
+import { ApodMediaView } from '../components/ApodMediaView';
+import { openExternalUrl } from '../utils/openExternalUrl';
+import { useRefreshByUser } from '../hooks/useRefreshByUser';
 
 export const PictureDayScreen: React.FC = () => {
-  const { status, data: dataQuery } = useGetApodQuery();
+  const { isError, data, refetch } = useGetApodQuery();
 
-  const validData = Boolean(dataQuery);
-  const imageUrl = dataQuery?.imageUrl;
-
-  const renderContainerStatus = () => {
-    if (status === 'pending') {
-      return (
-        <View style={styles.loaderContainer}>
-          <ActivityIndicator size="large" color={theme.UI_COLOR_CONFIG.icon} />
-        </View>
-      );
-    }
-
-    if (status === 'rejected') {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Космос временно недоступен</Text>
-        </View>
-      );
-    }
-    if (!validData) {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Космос временно недоступен</Text>
-        </View>
-      );
-    }
-
-    if (status === 'fulfilled' && imageUrl) {
-      return <RemoteImageWithLoader imageUrl={imageUrl} />;
-    } else {
-      return (
-        <View style={styles.errorContainer}>
-          <Text>Упс! Что-то пошло не так </Text>
-        </View>
-      );
-    }
-  };
+  const { isRefreshingByUser, refreshByUser } = useRefreshByUser([refetch]);
 
   return (
     <SafeAreaView edges={['top', 'right', 'left']} style={styles.screen}>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-        <View style={styles.image}>{renderContainerStatus()}</View>
-        {status === 'fulfilled' && (
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshingByUser}
+            onRefresh={refreshByUser}
+            //NOTE: Цвет для iOS
+            tintColor={theme.UI_COLOR_CONFIG.icon}
+            //NOTE: Цвета для Android
+            colors={[theme.UI_COLOR_CONFIG.icon]}
+          />
+        }
+      >
+        <View style={styles.image}>
+          <QueryStateView
+            data={data}
+            isError={isError}
+            errorMessage="Не удалось загрузить фото дня. Потяните вниз, чтобы повторить"
+            renderData={apod => <ApodMediaView apod={apod} />}
+          />
+        </View>
+        {data && (
           <View style={styles.textContainer}>
-            <AppText variant="h1">{dataQuery?.title}</AppText>
-            <AppText variant="caption">{dataQuery?.date}</AppText>
-            <AppText variant="body">{dataQuery?.explanation}</AppText>
+            <AppText variant="h1">{data.title}</AppText>
+            <AppText variant="caption">{data.date}</AppText>
+            <AppText variant="body">{data.explanation}</AppText>
+            <Pressable
+              style={styles.linkButton}
+              onPress={() => openExternalUrl(data.permalink)}
+            >
+              <AppText variant="body" style={styles.linkText}>
+                Открыть на сайте NASA
+              </AppText>
+            </Pressable>
           </View>
         )}
       </ScrollView>
@@ -89,23 +83,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.xs,
     paddingVertical: theme.spacing.m,
   },
-  loaderContainer: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 0,
-    top: 12,
+  linkButton: {
+    minHeight: 48,
     justifyContent: 'center',
-    alignItems: 'center',
   },
-  errorContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffe6e6',
+  linkText: {
+    textDecorationLine: 'underline',
   },
 });
