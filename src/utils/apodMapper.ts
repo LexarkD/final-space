@@ -36,9 +36,8 @@ const toResizedImageUrl = (hdurl: string): string | null => {
   return `${baseUrl}?w=${APOD_IMAGE_WIDTH}&fit=clip`;
 };
 
-//NOTE: APOD находится в процессе переезда на новый API и задокументированные media_type: 'image' | 'video' | 'iframe' не соотвествуют реальным результатам тестов.
 const toMediaType = (value: string): Apod['media_type'] => {
-  if (value === 'image' || value === 'video' || value === 'iframe') {
+  if (value === 'image' || value === 'video') {
     return value;
   }
   return 'other';

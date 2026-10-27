@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Linking } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { AppText } from './AppText';
 import { theme } from '../constants/theme';
 import type { ArticleRead } from '../types/newsApiType';
 import { RemoteImageWithLoader } from './RemoteImageWithLoader';
+import { openExternalUrl } from '../utils/openExternalUrl';
 
 type NewsCardProps = {
   article: ArticleRead;
@@ -12,17 +13,11 @@ type NewsCardProps = {
 export const NewsCard: React.FC<NewsCardProps> = ({ article }) => {
   const dateNews = article.published_at.split('T')[0];
 
-  const handlePress = async () => {
-    const supported = await Linking.canOpenURL(article.url);
-    if (supported) {
-      await Linking.openURL(article.url);
-    } else {
-      console.error(`Don't know how to open this URL: ${article.url}`);
-    }
-  };
-
   return (
-    <TouchableOpacity style={styles.card} onPress={handlePress}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => openExternalUrl(article.url)}
+    >
       <View style={styles.previewImage}>
         <RemoteImageWithLoader imageUrl={article.image_url} />
       </View>

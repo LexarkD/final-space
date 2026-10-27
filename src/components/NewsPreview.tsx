@@ -42,23 +42,4 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     borderRadius: 12,
   },
-  loaderContainer: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    bottom: 0,
-    top: 12,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  errorContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffe6e6',
-  },
 });

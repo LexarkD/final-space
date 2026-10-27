@@ -13,8 +13,7 @@ type QueryStateViewProps<T> = {
 };
 
 // NOTE: Порядок проверок: данные -> ошибка -> загрузка (паттерн stale-while-revalidate). Если данные уже есть, показываю их даже во время перезапроса или после его ошибки.
-// NOTE: function вместо React.FC, потому что React.FC не может быть дженериком
-
+// NOTE: Использую дженерик функцию, как альтернативу дженерик компоненту с костылем
 /**
  * Показывает состояние запроса: спиннер при первой загрузке, заглушку при ошибке без данных,
  * данные (и плашку «Не удалось обновить», если последний запрос упал).
@@ -70,7 +69,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: theme.spacing.m,
   },
   error: {
-    backgroundColor: '#ffe6e6',
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
   },
   staleBanner: {
     position: 'absolute',

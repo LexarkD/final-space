@@ -4,8 +4,8 @@ import { NavigateLink } from './NavigateLink';
 import { AppText } from './AppText';
 import { theme } from '../constants/theme';
 import { useGetApodQuery } from '../api/nasaApi';
-import { RemoteImageWithLoader } from './RemoteImageWithLoader';
 import { QueryStateView } from './QueryStateView';
+import { ApodMediaView } from './ApodMediaView';
 
 export const PictureDayPreview: React.FC = () => {
   const { isError, data } = useGetApodQuery();
@@ -18,15 +18,12 @@ export const PictureDayPreview: React.FC = () => {
           <QueryStateView
             data={data}
             isError={isError}
-            renderData={apod =>
-              apod.imageUrl ? (
-                <RemoteImageWithLoader imageUrl={apod.imageUrl} />
-              ) : (
-                <View style={styles.errorContainer}>
-                  <Text>Упс! Что-то пошло не так</Text>
-                </View>
-              )
-            }
+            renderData={apod => (
+              <ApodMediaView
+                apod={apod}
+                actionText="Нажмите, чтобы узнать подробнее"
+              />
+            )}
           />
         </View>
         <AppText variant="body">See More</AppText>
@@ -47,15 +44,5 @@ const styles = StyleSheet.create({
     height: 192,
     overflow: 'hidden',
     borderRadius: 12,
-  },
-  errorContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    top: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#ffe6e6',
   },
 });
