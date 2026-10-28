@@ -1,97 +1,147 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# FinalSpace
 
-# Getting Started
+Проект построен на базе React native (без Expo) и TypeScript. Основной фокус: клиент-серверное взаимодействие на RTK Query.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+Настройка окружения для разработки и запуска проекта: https://reactnative.dev/docs/set-up-your-environment
 
-## Step 1: Start Metro
+Требуется Node.js >= 22.11. Ключи API не нужны: оба используемых API публичные.
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+# Как начать
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+## Установка зависимостей: npm, ruby/bundler, CocoaPods
 
 ```sh
-# Using npm
+
+npm install
+
+bundle install
+
+npm run pods
+
+```
+
+## Запустить metro-сервер в дев. режиме
+
+```sh
+
 npm start
 
-# OR using Yarn
-yarn start
 ```
 
-## Step 2: Build and run your app
-
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
-
-### Android
+Запуск со сбросом кэша Metro и watchman:
 
 ```sh
-# Using npm
-npm run android
 
-# OR using Yarn
-yarn android
+npm run start-clean
+
 ```
 
-### iOS
-
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
-
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+## Запуск проекта iOS
 
 ```sh
-bundle install
-```
 
-Then, and every time you update your native dependencies, run:
-
-```sh
-bundle exec pod install
-```
-
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
-
-```sh
-# Using npm
 npm run ios
 
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+Запуск на конкретном симуляторе:
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+```sh
 
-## Step 3: Modify your app
+npm run ios-se    # iPhone SE (3rd generation)
 
-Now that you have successfully run the app, let's make changes!
+npm run ios-pro   # iPhone 16 Pro
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+```
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+Очистка нативной сборки iOS:
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+```sh
 
-## Congratulations! :tada:
+npm run ios-clean
 
-You've successfully run and modified your React Native App. :partying_face:
+```
 
-### Now what?
+## Запуск проекта Android
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+```sh
 
-# Troubleshooting
+npm run android
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+```
 
-# Learn More
+Очистка нативной сборки Android:
 
-To learn more about React Native, take a look at the following resources:
+```sh
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+npm run android-clean
+
+```
+
+## Проверка кода
+
+```sh
+
+npm run typecheck
+
+npm run lint
+
+```
+
+## Генерация клиента Spaceflight News API
+
+```sh
+
+npm run api-generate
+
+```
+
+Команда генерирует `src/api/newsOpenApi.ts` по OpenAPI-схеме сервера (настройки в `openapi-config.ts`). Сгенерированный файл не редактируется вручную: при следующей генерации он будет перезаписан.
+
+# О приложении
+
+FinalSpace — приложение о космосе. Показывает астрономическое фото дня от NASA и свежие новости космической отрасли.
+
+Главный экран показывает превью фото дня и последней новости.
+
+Экран «Фото дня» показывает изображение, заголовок, дату, описание и ссылку на публикацию на сайте NASA. Если в этот день NASA опубликовало видео или другой материал, который нельзя показать в приложении, вместо изображения выводится заглушка.
+
+Экран новостей показывает список статей с постраничной навигацией. Статья открывается в браузере.
+
+На всех экранах с данными работает pull-to-refresh.
+
+## Источники данных
+
+NASA APOD (новый API): https://science.nasa.gov/wp-json/wp/v2/apod-basic
+
+Spaceflight News API v4: https://spaceflightnewsapi.net
+
+## Используемый технический стек
+
+### Работа с сервером и управление состоянием
+
+@reduxjs/toolkit (RTK Query)
+
+react-redux
+
+@rtk-query/codegen-openapi
+
+### Навигация
+
+react-navigation (native-stack, static API)
+
+react-native-screens
+
+### Интерфейс
+
+react-native-safe-area-context
+
+react-native-svg
+
+### Качество кода
+
+TypeScript
+
+ESLint
+
+Prettier
