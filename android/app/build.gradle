@@ -79,7 +79,7 @@ android {
 
     namespace "com.finalspace"
     defaultConfig {
-        applicationId "com.finalspace"
+        applicationId "com.finalspace.sandbox"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
