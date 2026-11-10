@@ -6,6 +6,7 @@ import { HomeScreen } from './screens/Home.screen';
 import { SettingScreen } from './screens/Setting.screen';
 import { PictureDayScreen } from './screens/PictureDay.screen';
 import { NewsScreen } from './screens/News.screen';
+import { FetchLabScreen } from './screens/FetchLab.screen';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
 
@@ -21,6 +22,7 @@ const RootStack = createNativeStackNavigator({
     PictureDay: PictureDayScreen,
     News: NewsScreen,
     Setting: SettingScreen,
+    FetchLab: FetchLabScreen,
   },
 });
 

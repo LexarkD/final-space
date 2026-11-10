@@ -5,7 +5,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { createBaseRequest } from '../api/baseRequest';
 import type { PaginatedArticleListRead } from '../types/newsApiType';
 
-// NOTE: Создание функции ничего не отправляет. Запрос уходит только при вызове
 const newsRequest = createBaseRequest('https://api.spaceflightnewsapi.net');
 const nasaSiteRequest = createBaseRequest('https://science.nasa.gov');
 

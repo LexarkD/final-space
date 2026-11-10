@@ -1,5 +1,11 @@
 import React from 'react';
-import { ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import {
+  View,
+  ScrollView,
+  StyleSheet,
+  RefreshControl,
+  Text,
+} from 'react-native';
 
 import { HomeScreenHeader } from '../components/HomeScreenHeader';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -38,7 +44,11 @@ export const HomeScreen: React.FC = () => {
         <HomeScreenHeader />
         <PictureDayPreview />
         <NewsPreview />
-        <NavigateLink screen="FetchLab">FetchLab</NavigateLink>
+        <NavigateLink screen="FetchLab">
+          <View style={styles.card}>
+            <Text style={theme.typography.h1}>FetchLab</Text>
+          </View>
+        </NavigateLink>
       </ScrollView>
     </SafeAreaView>
   );
@@ -58,5 +68,11 @@ const styles = StyleSheet.create({
     gap: 8,
     paddingHorizontal: theme.spacing.m,
     paddingBottom: theme.spacing.l,
+  },
+  card: {
+    gap: theme.spacing.m,
+    padding: theme.spacing.m,
+    borderRadius: 12,
+    backgroundColor: theme.UI_COLOR_CONFIG.cardBackground,
   },
 });
