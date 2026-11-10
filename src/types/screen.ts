@@ -4,6 +4,7 @@ export type RootStackParamList = {
   PictureDay: undefined;
   News: undefined;
   Setting: undefined;
+  FetchLab: undefined;
 };
 
 declare global {

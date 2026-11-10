@@ -9,6 +9,7 @@ import { useGetNewsPreviewQuery } from '../api/newsPreviewApi';
 import { useGetApodQuery } from '../api/nasaApi';
 import { NewsPreview } from '../components/NewsPreview';
 import { useRefreshByUser } from '../hooks/useRefreshByUser';
+import { NavigateLink } from '../components/NavigateLink';
 
 export const HomeScreen: React.FC = () => {
   const { refetch: refetchAPOD } = useGetApodQuery();
@@ -37,6 +38,7 @@ export const HomeScreen: React.FC = () => {
         <HomeScreenHeader />
         <PictureDayPreview />
         <NewsPreview />
+        <NavigateLink screen="FetchLab">FetchLab</NavigateLink>
       </ScrollView>
     </SafeAreaView>
   );
