@@ -4,18 +4,24 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AppText } from '../components/AppText';
 import { theme } from '../constants/theme';
 
-//Задача - У запроса в каждый момент есть состояние: идёт загрузка, пришла ошибка или пришли данные. Экран должен показывать каждое из них.
+//Задача - одно состояние запроса вместо трех частей из независимых useState
+//NOTE: Это размеченное объединение отображает три варианта состояния запроса.
+// ДАННЫЙ RequestState КОРРЕКТЕН С УЧЕТОМ ТОГО, ЧТО ЭТО ПЕРВЫЙ ЗАПРОС! Т.е. пока что не рассматривается вариант, когда одновременно существуют старые данные и новая загрузка/новая ошибка.
+type RequestState =
+  | { status: 'loading' }
+  | { status: 'error'; error: FetchLabError }
+  | { status: 'success'; title: string };
 
 type FetchLabError =
   | { kind: 'network'; message: string }
   | { kind: 'http'; status: number; body: unknown }
   | { kind: 'parse'; status: number; message: string };
 
-// NOTE: Cсылки для ручных тестов
-// const APOD_URL = 'https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=1'; // Рабочий url
+// NOTE: Ссылки для ручных тестов
+const APOD_URL = 'https://science.nasa.gov/wp-json/wp/v2/apod-basic?per_page=1'; // Рабочий url
 // const APOD_URL = 'https://science.nasa.gov/wp-json/wp/v2/apod-basic-xxx'; // Ошибка в url, тело ошибки JSON
 // const APOD_URL = 'https://science.nasa.gov/'; //это обычная HTML-страница со статусом 200.
-const APOD_URL = 'https://science.nasa.gov/nonexistent-page-xxx'; // Ошибка в url, тело ошибки HTML-страница
+// const APOD_URL = 'https://science.nasa.gov/nonexistent-page-xxx'; // Ошибка в url, тело ошибки HTML-страница
 
 // Сообщение для пользователя. Технические детали ему не нужны
 const getErrorMessage = (error: FetchLabError): string => {
@@ -33,10 +39,8 @@ const getErrorMessage = (error: FetchLabError): string => {
 };
 
 export const FetchLabScreen: React.FC = () => {
-  const [title, setTitle] = useState<string | null>(null);
-  //NOTE: Запрос начинается с загрузки (isLoading = true)
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<FetchLabError | null>(null);
+  // NOTE: Запрос начинается с загрузки
+  const [state, setState] = useState<RequestState>({ status: 'loading' });
 
   useEffect(() => {
     const loadApod = async () => {
@@ -44,9 +48,10 @@ export const FetchLabScreen: React.FC = () => {
       try {
         response = await fetch(APOD_URL);
       } catch (e) {
-        setError({ kind: 'network', message: String(e) });
-        //NOTE: Тут и далее, после того, как я получил ошибку, нужно убрать ActivityIndicator (setIsLoading(false))
-        setIsLoading(false);
+        setState({
+          status: 'error',
+          error: { kind: 'network', message: String(e) },
+        });
         return;
       }
 
@@ -55,50 +60,48 @@ export const FetchLabScreen: React.FC = () => {
         try {
           body = await response.json();
         } catch {
-          //Уточняющий комментарий catch {} ничего не возвращает, поэтому body остается = null;
+          // catch {} ничего не возвращает, поэтому body остается = null;
         }
-        setError({ kind: 'http', status: response.status, body });
-        setIsLoading(false);
+        setState({
+          status: 'error',
+          error: { kind: 'http', status: response.status, body },
+        });
         return;
-        //BAGFIX: в прошлой итерациии я забыл установить return для try/catch. А также забыл стереть дублирующее решение через .const body = await response.json().catch(() => null);
       }
 
       let json: any; // NOTE: any временно
       try {
         json = await response.json();
       } catch (e) {
-        setError({
-          kind: 'parse',
-          status: response.status,
-          message: String(e),
+        setState({
+          status: 'error',
+          error: { kind: 'parse', status: response.status, message: String(e) },
         });
-        setIsLoading(false);
         return;
       }
-
-      // NOTE: намеренно вне try — баг в моем коде не должен маскироваться под сетевую ошибку. Баг в коде будет отлавливаться на другом уровне
-      setTitle(json[0].title);
-      // Тут есть намеренно необработанная точка выхода. Если сервер ответит 200 с пустым массивом [], то обращение к .title бросит TypeError и код не дойдет до setIsLoading(false)- я получаю вечный спинер
-      setIsLoading(false);
+      // NOTE: Пятая точка выхода: вечный спиннер - проблема остается нерешенной
+      // Если json[0].title бросит ошибку, setState не выполнится, state останется { status: 'loading' }
+      setState({ status: 'success', title: json[0].title });
     };
 
     loadApod();
   }, []);
 
-  const renderContent = () => {
-    if (isLoading) {
-      return <ActivityIndicator color={theme.UI_COLOR_CONFIG.icon} />;
+  const renderContent = (): React.ReactElement => {
+    switch (state.status) {
+      case 'loading':
+        return <ActivityIndicator color={theme.UI_COLOR_CONFIG.icon} />;
+      case 'error':
+        return (
+          <>
+            <AppText variant="body">{getErrorMessage(state.error)}</AppText>
+            {/* детали для разработчика */}
+            <AppText variant="caption">{JSON.stringify(state.error)}</AppText>
+          </>
+        );
+      case 'success':
+        return <AppText variant="h1">{state.title}</AppText>;
     }
-    if (error) {
-      return (
-        <>
-          <AppText variant="body">{getErrorMessage(error)}</AppText>
-          {/* детали для разработчика */}
-          <AppText variant="caption">{JSON.stringify(error)}</AppText>
-        </>
-      );
-    }
-    return <AppText variant="h1">{title}</AppText>;
   };
 
   return (
@@ -116,6 +119,13 @@ const styles = StyleSheet.create({
     backgroundColor: theme.UI_COLOR_CONFIG.screenBackground,
   },
 });
+
+// Решение проблем:
+// Точки выхода изменились: вместо пары setError(...) + setIsLoading(false) теперь один setState(...).
+// Переход в новое состояние автоматически означает выход из старого, поэтому «забыть выключить загрузку» больше нельзя: отдельного флага загрузки просто нет.
+// 8 комбинаций, часть из них бессмысленны => решено: тип допускает только 3 комбинации
+// title в ветке успеха string | null => решено: в 'success' он string
+// Неочевидный порядок if в renderContent => решено: switch перебирает варианты, а не приоритеты.
 
 // Эксперименты - проверяю сообщения для пользователя
 // 4 случая:
@@ -140,10 +150,6 @@ const styles = StyleSheet.create({
 // Результат тестов 2 и 4 выводит пользователю одинаковый ответ - это не баг. Для пользователя это одна и та же ошибка. Разница в body, нужна только разработчику
 
 // Недостатки:
-// Самое прямолинейное решение — завести по useState на каждую часть состояния запроса : флаг загрузки, ошибку и данные.
-// Три независимых значения (есть / нет) дают 8 комбинаций, из которых часть не имеет смысла вообще.
-// TypeScript не знает, как связаны три значения: в ветке успеха title по-прежнему string | null.
-// Так же необходимо вручную переключать части состояния, для корректной отрисовки статуса - к примеру setIsLoading(false) вручную прописано 4 раза, для того чтобы индикатор загрузки пропал и позволил отоборазиться -результату.
-// Пятая, неявная точка выхода — исключение в setTitle(json[0].title): там setIsLoading(false) не выполнится, и спиннер будет вечным.
-// Ручное управление порождает ошибки и вероятность возникновения бессмысленных комбинаций флагов.
-// Сложные комбинации состояний пораждают неочевидную логику в коде. К примеру, при isLoading = true и заданном error, показан будет индикатор загрузки. Это неочевидный эффект порядка проверок (if) внутри renderContent()
+// Данная реализация состояний (RequestState) актуальна только при ПЕРВОМ запросе - не учитывает, что возможны старые данные.
+// Пятая точка выхода: вечный спиннер - проблема остается нерешенной. Если json[0].title бросит ошибку, setState не выполнится, state останется { status: 'loading' }
+// json[0].title имеет тип any, поэтому строка title: json[0].title проходит проверку типов, даже если там окажется число или undefined.
